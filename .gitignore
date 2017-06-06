@@ -12,3 +12,11 @@
 
 # Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
 .glide/
+
+# DS_STORE
+.DS_Store
+
+# VS Code
+.vscode/
+
+.idea
