@@ -6,7 +6,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/uniplaces/go-logger/internal"
-	"github.com/uniplaces/go-logger/logger"
 )
 
 func TestLogrusLoggerLevel(t *testing.T) {
@@ -47,9 +46,9 @@ func TestLogrusLoggerWithFields(t *testing.T) {
 	var buffer bytes.Buffer
 	l := internal.NewLogrusLogger("warning", &buffer)
 
-	l.DebugWithFields("debug", logger.Fields{"test": 123})
+	l.DebugWithFields("debug", map[string]interface{}{"test": 123})
 	assert.Empty(t, buffer.String())
 
-	l.WarningWithFields("warning", logger.Fields{"abc": 321})
+	l.WarningWithFields("warning", map[string]interface{}{"abc": 321})
 	assert.Contains(t, buffer.String(), "\"abc\":321")
 }

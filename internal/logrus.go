@@ -7,7 +7,6 @@ import (
 	"runtime"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/uniplaces/go-logger/logger"
 )
 
 // defines which levels log stacktrace
@@ -24,7 +23,7 @@ type logrusLogger struct {
 	*logrus.Logger
 }
 
-func NewLogrusLogger(level string, writer io.Writer) logger.Logger {
+func NewLogrusLogger(level string, writer io.Writer) *logrusLogger {
 	logrusLevel, err := logrus.ParseLevel(level)
 	if err != nil {
 		panic(fmt.Sprintf("invalid log level (%s)", level))
@@ -43,7 +42,7 @@ func NewLogrusLogger(level string, writer io.Writer) logger.Logger {
 	return instance
 }
 
-func (logger *logrusLogger) ErrorWithFields(message string, fields logger.Fields) {
+func (logger *logrusLogger) ErrorWithFields(message string, fields map[string]interface{}) {
 	entry := logger.entry(fields, stackTraceLevels[logrus.ErrorLevel])
 	entry.Error(message)
 }
@@ -52,7 +51,7 @@ func (logger *logrusLogger) Error(message string) {
 	logger.ErrorWithFields(message, nil)
 }
 
-func (logger *logrusLogger) WarningWithFields(message string, fields logger.Fields) {
+func (logger *logrusLogger) WarningWithFields(message string, fields map[string]interface{}) {
 	entry := logger.entry(fields, stackTraceLevels[logrus.WarnLevel])
 	entry.Warning(message)
 }
@@ -61,7 +60,7 @@ func (logger *logrusLogger) Warning(message string) {
 	logger.WarningWithFields(message, nil)
 }
 
-func (logger *logrusLogger) InfoWithFields(message string, fields logger.Fields) {
+func (logger *logrusLogger) InfoWithFields(message string, fields map[string]interface{}) {
 	entry := logger.entry(fields, stackTraceLevels[logrus.InfoLevel])
 	entry.Info(message)
 }
@@ -70,7 +69,7 @@ func (logger *logrusLogger) Info(message string) {
 	logger.InfoWithFields(message, nil)
 }
 
-func (logger *logrusLogger) DebugWithFields(message string, fields logger.Fields) {
+func (logger *logrusLogger) DebugWithFields(message string, fields map[string]interface{}) {
 	entry := logger.entry(fields, stackTraceLevels[logrus.DebugLevel])
 	entry.Debug(message)
 }
@@ -79,7 +78,7 @@ func (logger *logrusLogger) Debug(message string) {
 	logger.DebugWithFields(message, nil)
 }
 
-func (logger *logrusLogger) entry(fields logger.Fields, includeStackTrace bool) *logrus.Entry {
+func (logger *logrusLogger) entry(fields map[string]interface{}, includeStackTrace bool) *logrus.Entry {
 	stackTrace := buildStackTrace()
 
 	if len(fields) == 0 {

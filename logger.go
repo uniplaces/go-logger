@@ -7,10 +7,32 @@ import (
 	"sync"
 
 	"github.com/uniplaces/go-logger/internal"
-	"github.com/uniplaces/go-logger/logger"
 )
 
-var instance logger.Logger
+// Fields represents a map of fields
+type Fields map[string]interface{}
+
+type extraField struct {
+	key   string
+	value interface{}
+}
+
+// Logger is logger for logger
+type Logger interface {
+	ErrorWithFields(message string, fields map[string]interface{})
+	Error(message string)
+
+	WarningWithFields(message string, fields map[string]interface{})
+	Warning(message string)
+
+	InfoWithFields(message string, fields map[string]interface{})
+	Info(message string)
+
+	DebugWithFields(message string, fields map[string]interface{})
+	Debug(message string)
+}
+
+var instance Logger
 var once sync.Once
 
 // Init initializes logger instance
@@ -28,11 +50,11 @@ func Init(config Config) error {
 }
 
 // InitWithInstance sets logger to an instance
-func InitWithInstance(newInstance logger.Logger) {
+func InitWithInstance(newInstance Logger) {
 	instance = newInstance
 }
 
-func ErrorWithFields(message string, fields logger.Fields) {
+func ErrorWithFields(message string, fields Fields) {
 	if instance == nil {
 		return
 	}
@@ -52,7 +74,7 @@ func Error(message string) {
 	instance.Error(message)
 }
 
-func WarningWithFields(message string, fields logger.Fields) {
+func WarningWithFields(message string, fields Fields) {
 	if instance == nil {
 		return
 	}
@@ -72,7 +94,7 @@ func Warning(message string) {
 	instance.Warning(message)
 }
 
-func InfoWithFields(message string, fields logger.Fields) {
+func InfoWithFields(message string, fields Fields) {
 	if instance == nil {
 		return
 	}
@@ -92,7 +114,7 @@ func Info(message string) {
 	instance.Info(message)
 }
 
-func DebugWithFields(message string, fields logger.Fields) {
+func DebugWithFields(message string, fields Fields) {
 	if instance == nil {
 		return
 	}

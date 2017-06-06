@@ -1,4 +1,4 @@
-package logger
+package go_logger
 
 func CreateFields(fields map[string]interface{}, extraFields ...extraField) Fields {
 	if len(extraFields) > 0 && fields != nil {
