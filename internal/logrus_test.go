@@ -52,3 +52,11 @@ func TestLogrusLoggerWithFields(t *testing.T) {
 	l.WarningWithFields("warning", map[string]interface{}{"abc": 321})
 	assert.Contains(t, buffer.String(), "\"abc\":321")
 }
+
+func TestLogrusLoggerInvalidConfig(t *testing.T) {
+	defer func() {
+		assert.NotNil(t, recover())
+	}()
+
+	internal.NewLogrusLogger("invalid level", nil)
+}
