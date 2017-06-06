@@ -1,5 +1,9 @@
 package go_logger
 
+func CreateExtraFields(extraFields ...extraField) Fields {
+	return CreateFields(nil, extraFields...)
+}
+
 func CreateFields(fields map[string]interface{}, extraFields ...extraField) Fields {
 	if len(extraFields) > 0 && fields != nil {
 		tmpExtraFields := make(map[string]interface{}, len(extraFields))
