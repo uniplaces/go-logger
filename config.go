@@ -6,7 +6,7 @@ type Config struct {
 	level       string
 }
 
-// New returns initialized config
-func New(environment, level string) Config {
+// NewConfig returns initialized config
+func NewConfig(environment, level string) Config {
 	return Config{environment: environment, level: level}
 }

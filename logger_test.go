@@ -9,7 +9,7 @@ import (
 func TestNew(t *testing.T) {
 	assert.Nil(t, instance)
 
-	config := New("env", "warning")
+	config := NewConfig("env", "warning")
 	Init(config)
 
 	assert.NotNil(t, instance)
