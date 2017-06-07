@@ -9,7 +9,6 @@ import (
 	"github.com/uniplaces/go-logger/internal"
 )
 
-// fields represents a map of fields
 type fields map[string]interface{}
 
 type extraField struct {
