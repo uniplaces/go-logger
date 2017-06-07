@@ -8,6 +8,8 @@ import (
 )
 
 func TestLogrusLoggerLevel(t *testing.T) {
+	t.Parallel()
+
 	var buffer bytes.Buffer
 	l := NewLogrusLogger("warning", &buffer)
 	l.Info("test info")
@@ -22,6 +24,8 @@ func TestLogrusLoggerLevel(t *testing.T) {
 }
 
 func TestLogrusLoggerStackTrace(t *testing.T) {
+	t.Parallel()
+
 	var buffer bytes.Buffer
 	l := NewLogrusLogger("debug", &buffer)
 
@@ -42,6 +46,8 @@ func TestLogrusLoggerStackTrace(t *testing.T) {
 }
 
 func TestLogrusLoggerStackTraceShouldSkip(t *testing.T) {
+	t.Parallel()
+
 	testData := map[string]bool{
 		"should not skip test":                             false,
 		"/usr/local/go/src/net/http/server.go":             true,
@@ -56,6 +62,8 @@ func TestLogrusLoggerStackTraceShouldSkip(t *testing.T) {
 }
 
 func TestLogrusLoggerWithFields(t *testing.T) {
+	t.Parallel()
+
 	var buffer bytes.Buffer
 	l := NewLogrusLogger("warning", &buffer)
 
@@ -67,6 +75,8 @@ func TestLogrusLoggerWithFields(t *testing.T) {
 }
 
 func TestLogrusLoggerInvalidConfig(t *testing.T) {
+	t.Parallel()
+
 	defer func() {
 		assert.NotNil(t, recover())
 	}()

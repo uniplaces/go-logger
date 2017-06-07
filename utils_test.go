@@ -7,12 +7,16 @@ import (
 )
 
 func TestCreateExtraField(t *testing.T) {
+	t.Parallel()
+
 	createdExtraField := CreateExtraField("test", 123)
 
 	assert.Equal(t, createdExtraField, extraField{key: "test", value: 123})
 }
 
 func TestCreateFields(t *testing.T) {
+	t.Parallel()
+
 	fieldsArg := map[string]interface{}{"test": 123}
 	extraField := extraField{key: "extra", value: 321}
 

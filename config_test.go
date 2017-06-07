@@ -7,6 +7,8 @@ import (
 )
 
 func TestNewConfig(t *testing.T) {
+	t.Parallel()
+
 	expectedConfig := Config{environment: "test", level: "warning"}
 	config := NewConfig("test", "warning")
 

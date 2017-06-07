@@ -7,6 +7,8 @@ import (
 )
 
 func TestNew(t *testing.T) {
+	t.Parallel()
+
 	assert.Nil(t, instance)
 
 	config := NewConfig("env", "warning")
