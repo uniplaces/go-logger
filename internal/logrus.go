@@ -113,14 +113,10 @@ func buildStackTrace() []string {
 			continue
 		}
 
-		stacktrace = append(stacktrace, fmt.Sprintf("%s on line %d", cleanFile(file), line))
+		stacktrace = append(stacktrace, fmt.Sprintf("%s on line %d", file, line))
 	}
 
 	return stacktrace
-}
-
-func cleanFile(file string) string {
-	return strings.Replace(file, "/go/src/", "", 1)
 }
 
 func shouldSkipFile(file string) bool {
