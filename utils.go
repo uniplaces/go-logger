@@ -5,7 +5,11 @@ func CreateExtraFields(extraFields ...extraField) Fields {
 }
 
 func CreateFields(fields map[string]interface{}, extraFields ...extraField) Fields {
-	if len(extraFields) > 0 && fields != nil {
+	if fields == nil {
+		fields = map[string]interface{}{}
+	}
+
+	if len(extraFields) > 0 {
 		tmpExtraFields := make(map[string]interface{}, len(extraFields))
 		for _, extraField := range extraFields {
 			tmpExtraFields[extraField.key] = extraField.value
