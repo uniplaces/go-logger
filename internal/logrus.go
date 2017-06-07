@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"runtime"
+	"strings"
 
 	"github.com/Sirupsen/logrus"
 )
@@ -110,8 +111,36 @@ func buildStackTrace() []string {
 
 		skip++
 
+		if shouldSkipFile(file) {
+			continue
+		}
+
 		stacktrace = append(stacktrace, fmt.Sprintf("%s on line %d", file, line))
 	}
 
 	return stacktrace
+}
+
+func shouldSkipFile(file string) bool {
+	skipLines := map[string]bool{
+		"/usr/local/go/src/net/http/server.go":  true,
+		"/usr/local/go/src/runtime/asm_amd64.s": true,
+	}
+
+	if _, ok := skipLines[file]; ok {
+		return true
+	}
+
+	skipIfContainsList := []string{
+		"github.com/uniplaces/go-logger",
+		"github.com/gin-gonic",
+	}
+
+	for _, s := range skipIfContainsList {
+		if strings.Contains(file, s) {
+			return true
+		}
+	}
+
+	return false
 }

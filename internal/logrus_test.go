@@ -1,16 +1,15 @@
-package internal_test
+package internal
 
 import (
 	"bytes"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/uniplaces/go-logger/internal"
 )
 
 func TestLogrusLoggerLevel(t *testing.T) {
 	var buffer bytes.Buffer
-	l := internal.NewLogrusLogger("warning", &buffer)
+	l := NewLogrusLogger("warning", &buffer)
 	l.Info("test info")
 	l.Debug("test debug")
 
@@ -24,7 +23,7 @@ func TestLogrusLoggerLevel(t *testing.T) {
 
 func TestLogrusLoggerStackTrace(t *testing.T) {
 	var buffer bytes.Buffer
-	l := internal.NewLogrusLogger("debug", &buffer)
+	l := NewLogrusLogger("debug", &buffer)
 
 	l.Debug("debug")
 	assert.NotContains(t, buffer.String(), "stacktrace")
@@ -42,9 +41,23 @@ func TestLogrusLoggerStackTrace(t *testing.T) {
 	assert.Contains(t, buffer.String(), "stacktrace")
 }
 
+func TestLogrusLoggerStackTraceShouldSkip(t *testing.T) {
+	testData := map[string]bool{
+		"should not skip test":                             false,
+		"/usr/local/go/src/net/http/server.go":             true,
+		"/vendor/github.com/uniplaces/go-logger/logger.go": true,
+		"/vendor/github.com/gin-gonic/gin/gin.go":          true,
+		"delivery/api/handlers/ping/ping.go":               false,
+	}
+
+	for file, expectedToSkip := range testData {
+		assert.Equal(t, expectedToSkip, shouldSkipFile(file))
+	}
+}
+
 func TestLogrusLoggerWithFields(t *testing.T) {
 	var buffer bytes.Buffer
-	l := internal.NewLogrusLogger("warning", &buffer)
+	l := NewLogrusLogger("warning", &buffer)
 
 	l.DebugWithFields("debug", map[string]interface{}{"test": 123})
 	assert.Empty(t, buffer.String())
@@ -58,5 +71,5 @@ func TestLogrusLoggerInvalidConfig(t *testing.T) {
 		assert.NotNil(t, recover())
 	}()
 
-	internal.NewLogrusLogger("invalid level", nil)
+	NewLogrusLogger("invalid level", nil)
 }
