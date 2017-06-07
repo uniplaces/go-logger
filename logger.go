@@ -9,27 +9,12 @@ import (
 	"github.com/uniplaces/go-logger/internal"
 )
 
-// Fields represents a map of fields
-type Fields map[string]interface{}
+// fields represents a map of fields
+type fields map[string]interface{}
 
 type extraField struct {
 	key   string
 	value interface{}
-}
-
-// Logger is logger for logger
-type Logger interface {
-	ErrorWithFields(message string, fields map[string]interface{})
-	Error(message string)
-
-	WarningWithFields(message string, fields map[string]interface{})
-	Warning(message string)
-
-	InfoWithFields(message string, fields map[string]interface{})
-	Info(message string)
-
-	DebugWithFields(message string, fields map[string]interface{})
-	Debug(message string)
 }
 
 var instance Logger
@@ -54,7 +39,7 @@ func InitWithInstance(newInstance Logger) {
 	instance = newInstance
 }
 
-func ErrorWithFields(message string, fields Fields) {
+func ErrorWithFields(message string, fields fields) {
 	if instance == nil {
 		return
 	}
@@ -74,7 +59,7 @@ func Error(message string) {
 	instance.Error(message)
 }
 
-func WarningWithFields(message string, fields Fields) {
+func WarningWithFields(message string, fields fields) {
 	if instance == nil {
 		return
 	}
@@ -94,7 +79,7 @@ func Warning(message string) {
 	instance.Warning(message)
 }
 
-func InfoWithFields(message string, fields Fields) {
+func InfoWithFields(message string, fields fields) {
 	if instance == nil {
 		return
 	}
@@ -114,7 +99,7 @@ func Info(message string) {
 	instance.Info(message)
 }
 
-func DebugWithFields(message string, fields Fields) {
+func DebugWithFields(message string, fields fields) {
 	if instance == nil {
 		return
 	}

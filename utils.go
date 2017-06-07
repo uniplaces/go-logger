@@ -1,12 +1,12 @@
 package go_logger
 
-func CreateExtraFields(extraFields ...extraField) Fields {
+func CreateExtraFields(extraFields ...extraField) fields {
 	return CreateFields(nil, extraFields...)
 }
 
-func CreateFields(fields map[string]interface{}, extraFields ...extraField) Fields {
-	if fields == nil {
-		fields = map[string]interface{}{}
+func CreateFields(fieldsMap map[string]interface{}, extraFields ...extraField) fields {
+	if fieldsMap == nil {
+		fieldsMap = map[string]interface{}{}
 	}
 
 	if len(extraFields) > 0 {
@@ -16,11 +16,11 @@ func CreateFields(fields map[string]interface{}, extraFields ...extraField) Fiel
 		}
 
 		if len(tmpExtraFields) > 0 {
-			fields["extra_info"] = tmpExtraFields
+			fieldsMap["extra_info"] = tmpExtraFields
 		}
 	}
 
-	return Fields(fields)
+	return fields(fieldsMap)
 }
 
 func CreateExtraField(key string, value interface{}) extraField {

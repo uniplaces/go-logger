@@ -16,7 +16,7 @@ func TestCreateFields(t *testing.T) {
 	fieldsArg := map[string]interface{}{"test": 123}
 	extraField := extraField{key: "extra", value: 321}
 
-	expected := Fields{
+	expected := fields{
 		"test": 123,
 		"extra_info": map[string]interface{}{
 			"extra": 321,
