@@ -42,14 +42,15 @@ logger.
 This project's main focus is to bring a common standard to our Go projects's logs and, as such, 
 please try to follow these guidelines when using this logger:
 
-##### 1 - Add contextual information when logging an error
+#### 1 - Add contextual information when logging an error
 
 ###### Use `AddContextField(key string, value interface{})`.
 
-Example: when you're trying to fetch something from dynamodb and it fails. 
+Example: when trying to fetch something from dynamodb and it fails.
+
 In this case, contextual logging would include the ID of the object you're trying to fetch. 
 
 
-##### 2 - Log as soon as possible
+#### 2 - Log as soon as possible
 
 Logs should be specific and easy to trace back, so generic error logging should be avoided.
