@@ -4,7 +4,7 @@
 # license that can be found in the LICENSE file.
 
 # The unix package provides access to the raw system call
-# logger of the underlying operating system.  Porting Go to
+# interface of the underlying operating system.  Porting Go to
 # a new architecture/operating system combination requires
 # some manual effort, though there are tools that automate
 # much of the process.  The auto-generated files have names

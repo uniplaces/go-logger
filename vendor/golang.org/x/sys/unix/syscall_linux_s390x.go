@@ -127,7 +127,7 @@ func (cmsg *Cmsghdr) SetLen(length int) {
 	cmsg.Len = uint64(length)
 }
 
-// Linux on s390x uses the old mmap logger, which requires arguments to be passed in a struct.
+// Linux on s390x uses the old mmap interface, which requires arguments to be passed in a struct.
 // mmap2 also requires arguments to be passed in a struct; it is currently not exposed in <asm/unistd.h>.
 func mmap(addr uintptr, length uintptr, prot int, flags int, fd int, offset int64) (xaddr uintptr, err error) {
 	mmap_args := [6]uintptr{addr, length, uintptr(prot), uintptr(flags), uintptr(fd), uintptr(offset)}

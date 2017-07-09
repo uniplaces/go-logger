@@ -191,7 +191,7 @@ type Kevent_t C.struct_kevent
 
 type FdSet C.fd_set
 
-// Routing and logger messages
+// Routing and interface messages
 
 const (
 	SizeofIfMsghdr         = C.sizeof_struct_if_msghdr

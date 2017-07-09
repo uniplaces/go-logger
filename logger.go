@@ -2,19 +2,11 @@ package go_logger
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"sync"
 
 	"github.com/uniplaces/go-logger/internal"
 )
-
-type fields map[string]interface{}
-
-type extraField struct {
-	key   string
-	value interface{}
-}
 
 var instance Logger
 var once sync.Once
@@ -22,7 +14,7 @@ var once sync.Once
 // Init initializes logger instance
 func Init(config Config) error {
 	if instance != nil {
-		return errors.New("logger cannot be initialized twice")
+		return errors.New("logger cannot be initialized more than once")
 	}
 
 	once.Do(func() {
@@ -33,87 +25,69 @@ func Init(config Config) error {
 	return nil
 }
 
-// InitWithInstance sets logger to an instance
-func InitWithInstance(newInstance Logger) {
+// InitWithInstance sets logger to an instance (for testing purposes)
+func InitWithInstance(newInstance Logger) error {
+	if instance != nil {
+		return errors.New("logger cannot be initialized more than once")
+	}
+
 	instance = newInstance
+
+	return nil
 }
 
-func ErrorWithFields(message string, fields fields) {
+// Error logs a error message
+func Error(err error) {
+	Builder().Error(err)
+}
+
+// Error logs a error message with fields
+func (builder builder) Error(err error) {
 	if instance == nil {
 		return
 	}
 
-	instance.ErrorWithFields(message, fields)
+	instance.ErrorWithFields(err.Error(), builder.getFields())
 }
 
-func Errorf(message string, parameters ...interface{}) {
-	Error(fmt.Sprintf(message, parameters...))
-}
-
-func Error(message string) {
-	if instance == nil {
-		return
-	}
-
-	instance.Error(message)
-}
-
-func WarningWithFields(message string, fields fields) {
-	if instance == nil {
-		return
-	}
-
-	instance.WarningWithFields(message, fields)
-}
-
-func Warningf(message string, parameters ...interface{}) {
-	Warning(fmt.Sprintf(message, parameters...))
-}
-
+// Warning logs a warning message
 func Warning(message string) {
+	Builder().Warning(message)
+}
+
+// Warning logs a warning message with fields
+func (builder builder) Warning(message string) {
 	if instance == nil {
 		return
 	}
 
-	instance.Warning(message)
+	instance.WarningWithFields(message, builder.getFields())
 }
 
-func InfoWithFields(message string, fields fields) {
-	if instance == nil {
-		return
-	}
-
-	instance.InfoWithFields(message, fields)
-}
-
-func Infof(message string, parameters ...interface{}) {
-	Info(fmt.Sprintf(message, parameters...))
-}
-
+// Info logs a info message
 func Info(message string) {
+	Builder().Info(message)
+}
+
+// Info logs a info message with fields
+func (builder builder) Info(message string) {
 	if instance == nil {
 		return
 	}
 
-	instance.Info(message)
+	instance.InfoWithFields(message, builder.getFields())
 }
 
-func DebugWithFields(message string, fields fields) {
-	if instance == nil {
-		return
-	}
-
-	instance.DebugWithFields(message, fields)
-}
-
-func Debugf(message string, parameters ...interface{}) {
-	Debug(fmt.Sprintf(message, parameters...))
-}
-
+// Debug logs a debug message
 func Debug(message string) {
+	Builder().Debug(message)
+}
+
+// Debug logs a debug message with fields
+func (builder builder) Debug(message string) {
 	if instance == nil {
 		return
 	}
 
-	instance.Debug(message)
+	instance.DebugWithFields(message, builder.getFields())
 }

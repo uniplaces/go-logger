@@ -4,7 +4,7 @@
 
 // +build darwin dragonfly freebsd linux netbsd openbsd solaris
 
-// Package unix contains an logger to the low-level operating system
+// Package unix contains an interface to the low-level operating system
 // primitives.  OS details vary depending on the underlying system, and
 // by default, godoc will display OS-specific documentation for the current
 // system.  If you want godoc to display OS documentation for another
@@ -12,7 +12,7 @@
 // you want to view documentation for freebsd/arm on linux/amd64, set $GOOS
 // to freebsd and $GOARCH to arm.
 // The primary use of this package is inside other packages that provide a more
-// portable logger to the system, such as "os", "time" and "net".  Use
+// portable interface to the system, such as "os", "time" and "net".  Use
 // those packages rather than this one if you can.
 // For details of the functions and data types in this package consult
 // the manuals for the appropriate operating system.

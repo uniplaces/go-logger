@@ -411,7 +411,7 @@ func (sa *SockaddrHCI) sockaddr() (unsafe.Pointer, _Socklen, error) {
 	return unsafe.Pointer(&sa.raw), SizeofSockaddrHCI, nil
 }
 
-// SockaddrCAN implements the Sockaddr logger for AF_CAN type sockets.
+// SockaddrCAN implements the Sockaddr interface for AF_CAN type sockets.
 // The RxID and TxID fields are used for transport protocol addressing in
 // (CAN_TP16, CAN_TP20, CAN_MCNET, and CAN_ISOTP), they can be left with
 // zero values for CAN_RAW and CAN_BCM sockets as they have no meaning.

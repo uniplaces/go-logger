@@ -93,7 +93,7 @@ var (
 
 // StdLogger is what your logrus-enabled library should take, that way
 // it'll accept a stdlib logger and a logrus logger. There's no standard
-// logger, this is the closest we get, unfortunately.
+// interface, this is the closest we get, unfortunately.
 type StdLogger interface {
 	Print(...interface{})
 	Printf(string, ...interface{})
@@ -108,7 +108,7 @@ type StdLogger interface {
 	Panicln(...interface{})
 }
 
-// The FieldLogger logger generalizes the Entry and Logger types
+// The FieldLogger interface generalizes the Entry and Logger types
 type FieldLogger interface {
 	WithField(key string, value interface{}) *Entry
 	WithFields(fields Fields) *Entry

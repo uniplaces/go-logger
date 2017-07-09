@@ -26,23 +26,24 @@ func TestLogrusLoggerLevel(t *testing.T) {
 func TestLogrusLoggerStackTrace(t *testing.T) {
 	t.Parallel()
 
+	var zeroValueFields map[string]interface{}
 	var buffer bytes.Buffer
 	l := NewLogrusLogger("debug", &buffer)
 
-	l.Debug("debug")
-	assert.NotContains(t, buffer.String(), "stacktrace")
+	l.DebugWithFields("debug", zeroValueFields)
+	assert.NotContains(t, buffer.String(), "stack_trace")
 	buffer.Reset()
 
-	l.Info("info")
-	assert.NotContains(t, buffer.String(), "stacktrace")
+	l.InfoWithFields("info", zeroValueFields)
+	assert.NotContains(t, buffer.String(), "stack_trace")
 	buffer.Reset()
 
-	l.Warning("warning")
-	assert.NotContains(t, buffer.String(), "stacktrace")
+	l.WarningWithFields("warning", zeroValueFields)
+	assert.NotContains(t, buffer.String(), "stack_trace")
 	buffer.Reset()
 
-	l.Error("error")
-	assert.Contains(t, buffer.String(), "stacktrace")
+	l.ErrorWithFields("error", zeroValueFields)
+	assert.Contains(t, buffer.String(), "stack_trace")
 }
 
 func TestLogrusLoggerStackTraceShouldSkip(t *testing.T) {

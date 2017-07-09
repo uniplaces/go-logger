@@ -4,7 +4,7 @@ import "time"
 
 const DefaultTimestampFormat = time.RFC3339
 
-// The Formatter logger is used to implement a custom Formatter. It takes an
+// The Formatter interface is used to implement a custom Formatter. It takes an
 // `Entry`. It exposes all the fields, including the default ones:
 //
 // * `entry.Data["msg"]`. The message passed from Info, Warn, Error ..

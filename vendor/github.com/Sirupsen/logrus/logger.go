@@ -19,7 +19,7 @@ type Logger struct {
 	// included formatters are `TextFormatter` and `JSONFormatter` for which
 	// TextFormatter is the default. In development (when a TTY is attached) it
 	// logs with colors, but to a file it wouldn't. You can easily implement your
-	// own that implements the `Formatter` logger, see the `README` or included
+	// own that implements the `Formatter` interface, see the `README` or included
 	// formatters for examples.
 	Formatter Formatter
 	// The logging level the logger should log at. This is typically (and defaults

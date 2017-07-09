@@ -25,7 +25,7 @@ const (
 	netbsd32Bit    = runtime.GOOS == "netbsd" && sizeofPtr == 4
 )
 
-// Do the logger allocations only once for common
+// Do the interface allocations only once for common
 // Errno values.
 var (
 	errEAGAIN error = syscall.EAGAIN

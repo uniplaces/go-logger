@@ -207,7 +207,7 @@ const (
 	AT_EACCESS          = C.AT_EACCESS
 )
 
-// Routing and logger messages
+// Routing and interface messages
 
 const (
 	SizeofIfMsghdr  = C.sizeof_struct_if_msghdr

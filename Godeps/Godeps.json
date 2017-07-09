@@ -17,11 +17,6 @@
 			"Rev": "346938d642f2ec3594ed81d874461961cd0faa76"
 		},
 		{
-			"ImportPath": "github.com/magiconair/properties/assert",
-			"Comment": "v1.7.2-7-g51463bf",
-			"Rev": "51463bfca2576e06c62a8504b5c0f06d61312647"
-		},
-		{
 			"ImportPath": "github.com/pmezard/go-difflib/difflib",
 			"Comment": "v1.0.0",
 			"Rev": "792786c7400a136282c1664665ae0a8db921c6c2"
