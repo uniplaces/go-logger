@@ -2,8 +2,10 @@ package go_logger
 
 import "os"
 
-const contextFieldsKey = "context"
-const logType = "app"
+const (
+	contextFieldsKey = "context"
+	logType          = "app"
+)
 
 type builder struct {
 	fields        map[string]interface{}
