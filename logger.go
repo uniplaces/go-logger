@@ -47,7 +47,7 @@ func (builder builder) Error(err error) {
 		return
 	}
 
-	instance.ErrorWithFields(err.Error(), builder.getFields())
+	instance.ErrorWithFields(err.Error(), builder.getFieldsWithMandatoryKeys())
 }
 
 // Warning logs a warning message
@@ -61,7 +61,7 @@ func (builder builder) Warning(message string) {
 		return
 	}
 
-	instance.WarningWithFields(message, builder.getFields())
+	instance.WarningWithFields(message, builder.getFieldsWithMandatoryKeys())
 }
 
 // Info logs a info message
@@ -75,7 +75,7 @@ func (builder builder) Info(message string) {
 		return
 	}
 
-	instance.InfoWithFields(message, builder.getFields())
+	instance.InfoWithFields(message, builder.getFieldsWithMandatoryKeys())
 }
 
 // Debug logs a debug message
@@ -89,5 +89,5 @@ func (builder builder) Debug(message string) {
 		return
 	}
 
-	instance.DebugWithFields(message, builder.getFields())
+	instance.DebugWithFields(message, builder.getFieldsWithMandatoryKeys())
 }
