@@ -48,8 +48,11 @@ please try to follow these guidelines when using this logger:
 
 Example: when trying to fetch something from dynamodb and it fails.
 
-In this case, contextual logging would include the ID of the object you're trying to fetch. 
+In this case, contextual logging would include the ID of the object you're trying to fetch.
 
+_**Note:** avoid using this when handling sensitive information!_
+
+---
 
 #### 2 - Log as soon as possible
 
