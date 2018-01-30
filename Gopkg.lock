@@ -2,11 +2,6 @@
 
 
 [[projects]]
-  name = "github.com/Sirupsen/logrus"
-  packages = ["."]
-  revision = "a437dfd2463eaedbec3dfe443e477d3b0a810b3f"
-
-[[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
@@ -28,13 +23,28 @@
   version = "v1.2.0"
 
 [[projects]]
+  name = "github.com/uniplaces/logrus"
+  packages = ["."]
+  revision = "9cb1d692bd0ff060763686663b6484e297d12b0d"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/crypto"
+  packages = ["ssh/terminal"]
+  revision = "1875d0a70c90e57f11972aefd42276df65e895b9"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/sys"
-  packages = ["unix"]
-  revision = "30237cf4eefd639b184d1f2cb77a581ea0be8947"
+  packages = [
+    "unix",
+    "windows"
+  ]
+  revision = "3dbebcf8efb6a5011a60c2b4591c1022a759af8a"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6571d08902b58e9b760c4b5e4c92ea50ff6c54a6779946e25d456b480a7c39ca"
+  inputs-digest = "ac6871ee43a685ad962e0ff36442ca29a0dc29b860a6ca0595f87a7df21ca237"
   solver-name = "gps-cdcl"
   solver-version = 1

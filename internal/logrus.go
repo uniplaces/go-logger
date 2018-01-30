@@ -7,7 +7,8 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/uniplaces/logrus"
+	"github.com/uniplaces/go-logger"
 )
 
 // defines which levels log stack trace
@@ -27,7 +28,7 @@ const (
 	stackTraceFormat = "%s on line %d"
 )
 
-func NewLogrusLogger(level string, writer io.Writer) logrusLogger {
+func NewLogrusLogger(level string, writer io.Writer) go_logger.Logger {
 	logrusLevel, err := logrus.ParseLevel(level)
 	if err != nil {
 		panic(fmt.Sprintf("invalid log level (%s)", level))
@@ -37,7 +38,9 @@ func NewLogrusLogger(level string, writer io.Writer) logrusLogger {
 		Logger: logrus.New(),
 	}
 
-	instance.Formatter = &logrus.JSONFormatter{}
+	instance.Formatter = &logrus.JSONFormatter{
+		IntLogLevels:true,
+	}
 	instance.Level = logrusLevel
 	instance.Out = writer
 
