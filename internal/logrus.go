@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/uniplaces/logrus"
-	"github.com/uniplaces/go-logger"
 )
 
 // defines which levels log stack trace
@@ -28,7 +27,7 @@ const (
 	stackTraceFormat = "%s on line %d"
 )
 
-func NewLogrusLogger(level string, writer io.Writer) go_logger.Logger {
+func NewLogrusLogger(level string, writer io.Writer) logrusLogger {
 	logrusLevel, err := logrus.ParseLevel(level)
 	if err != nil {
 		panic(fmt.Sprintf("invalid log level (%s)", level))
