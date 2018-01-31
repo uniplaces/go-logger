@@ -25,7 +25,7 @@
 [[projects]]
   name = "github.com/uniplaces/logrus"
   packages = ["."]
-  revision = "9cb1d692bd0ff060763686663b6484e297d12b0d"
+  revision = "e3e67f834921ddd1bb3ef5594e139d631899e11d"
 
 [[projects]]
   branch = "master"
@@ -45,6 +45,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ac6871ee43a685ad962e0ff36442ca29a0dc29b860a6ca0595f87a7df21ca237"
+  inputs-digest = "5f05ba68560e0d7d3aa2c9cbcdd2bf05cd7434d9d8de292475f56a2e7e6915e9"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -38,7 +38,7 @@ func NewLogrusLogger(level string, writer io.Writer) logrusLogger {
 	}
 
 	instance.Formatter = &logrus.JSONFormatter{
-		IntLogLevels:true,
+		EnableIntLogLevels:true,
 	}
 	instance.Level = logrusLevel
 	instance.Out = writer
