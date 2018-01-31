@@ -7,7 +7,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/uniplaces/logrus"
 )
 
 // defines which levels log stack trace
@@ -37,7 +37,9 @@ func NewLogrusLogger(level string, writer io.Writer) logrusLogger {
 		Logger: logrus.New(),
 	}
 
-	instance.Formatter = &logrus.JSONFormatter{}
+	instance.Formatter = &logrus.JSONFormatter{
+		EnableIntLogLevels:true,
+	}
 	instance.Level = logrusLevel
 	instance.Out = writer
 
