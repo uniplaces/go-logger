@@ -55,18 +55,7 @@ func NewLogrusLogger(level string, writer io.Writer) logrusLogger {
 }
 
 func (logger logrusLogger) ErrorWithFields(err error, fields map[string]interface{}) {
-	var stackTrace []string
-
-	if stackTraceLevels[logrus.ErrorLevel] {
-		switch err := err.(type) {
-		case stackTracer:
-			for _, f := range err.StackTrace() {
-				stackTrace = append(stackTrace, fmt.Sprintf(stackTraceErrorPkgFormat, f))
-			}
-		default:
-			stackTrace = buildStackTrace()
-		}
-	}
+	stackTrace := logger.getErrorLevelStackTrace(err)
 
 	entry := logger.entry(fields, stackTrace)
 	entry.Error(err.Error())
@@ -100,6 +89,22 @@ func (logger logrusLogger) DebugWithFields(message string, fields map[string]int
 
 	entry := logger.entry(fields, stackTrace)
 	entry.Debug(message)
+}
+
+func (logger logrusLogger) getErrorLevelStackTrace(err error) []string {
+	var stackTrace []string
+	if stackTraceLevels[logrus.ErrorLevel] {
+		switch err := err.(type) {
+		case stackTracer:
+			for _, f := range err.StackTrace() {
+				stackTrace = append(stackTrace, fmt.Sprintf(stackTraceErrorPkgFormat, f))
+			}
+		default:
+			stackTrace = buildStackTrace()
+		}
+	}
+
+	return stackTrace
 }
 
 func (logger logrusLogger) entry(fields map[string]interface{}, stackTrace []string) *logrus.Entry {
