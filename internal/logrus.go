@@ -29,7 +29,7 @@ type stackTracer interface {
 
 const (
 	stackTraceKey    = "stack_trace"
-	stackTraceFormat = "%s on line %d"
+	stackTraceFormat = "%s:%d"
 	stackTraceErrorPkgFormat = "%+v"
 )
 
@@ -96,8 +96,8 @@ func (logger logrusLogger) getErrorLevelStackTrace(err error) []string {
 	if stackTraceLevels[logrus.ErrorLevel] {
 		switch err := err.(type) {
 		case stackTracer:
-			for _, f := range err.StackTrace() {
-				stackTrace = append(stackTrace, fmt.Sprintf(stackTraceErrorPkgFormat, f))
+			for _, frame := range err.StackTrace() {
+				stackTrace = append(stackTrace, fmt.Sprintf(stackTraceErrorPkgFormat, frame))
 			}
 		default:
 			stackTrace = buildStackTrace()
