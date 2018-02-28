@@ -44,7 +44,7 @@ func TestLogWithFieldsAndStacktrace(t *testing.T) {
 	err := InitWithInstance(internal.NewLogrusLogger("error", &buffer))
 	require.Nil(t, err)
 
-	errorWithStackTrace := errorsPkg.New("error test")
+	errorWithStackTrace := justToShowUpInStackTrace()
 
 	Builder().
 		AddField("key", "value").
@@ -55,8 +55,9 @@ func TestLogWithFieldsAndStacktrace(t *testing.T) {
 	assert.Contains(t, buffer.String(), "\"key\":\"value\"")
 	assert.Contains(t, buffer.String(), "\"stack_trace\":")
 	// test stack trace strings
+	assert.Contains(t, buffer.String(), "github.com/uniplaces/go-logger.justToShowUpInStackTrace")
 	assert.Contains(t, buffer.String(), "github.com/uniplaces/go-logger.TestLogWithFieldsAndStacktrace")
-	assert.Contains(t, buffer.String(), "github.com/uniplaces/go-logger/logger_test.go:47")
+	assert.Contains(t, buffer.String(), "github.com/uniplaces/go-logger/logger_test.go:84")
 
 	resetInstance()
 }
@@ -77,4 +78,8 @@ func TestLog(t *testing.T) {
 
 func resetInstance() {
 	instance = nil
+}
+
+func justToShowUpInStackTrace() error {
+	return errorsPkg.New("error test")
 }
