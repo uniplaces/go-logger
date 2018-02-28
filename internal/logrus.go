@@ -58,11 +58,12 @@ func (logger logrusLogger) ErrorWithFields(err error, fields map[string]interfac
 	var stackTrace []string
 
 	if stackTraceLevels[logrus.ErrorLevel] {
-		if err, ok := err.(stackTracer); ok {
+		switch err := err.(type) {
+		case stackTracer:
 			for _, f := range err.StackTrace() {
 				stackTrace = append(stackTrace, fmt.Sprintf(stackTraceErrorPkgFormat, f))
 			}
-		} else {
+		default:
 			stackTrace = buildStackTrace()
 		}
 	}
