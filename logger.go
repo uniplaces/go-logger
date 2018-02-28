@@ -47,7 +47,7 @@ func (builder builder) Error(err error) {
 		return
 	}
 
-	instance.ErrorWithFields(err.Error(), builder.getFieldsWithMandatoryKeys())
+	instance.ErrorWithFields(err, builder.getFieldsWithMandatoryKeys())
 }
 
 // Warning logs a warning message

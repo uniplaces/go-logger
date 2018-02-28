@@ -3,6 +3,7 @@ package internal
 import (
 	"bytes"
 	"testing"
+	"errors"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -19,7 +20,7 @@ func TestLogrusLoggerLevel(t *testing.T) {
 
 	l.Error("test error")
 
-	assert.Contains(t, buffer.String(), "\"level\":\"error\"")
+	assert.Contains(t, buffer.String(), "\"level\":2")
 	assert.Contains(t, buffer.String(), "\"msg\":\"test error\"")
 }
 
@@ -42,7 +43,7 @@ func TestLogrusLoggerStackTrace(t *testing.T) {
 	assert.NotContains(t, buffer.String(), "stack_trace")
 	buffer.Reset()
 
-	l.ErrorWithFields("error", zeroValueFields)
+	l.ErrorWithFields(errors.New("error"), zeroValueFields)
 	assert.Contains(t, buffer.String(), "stack_trace")
 }
 

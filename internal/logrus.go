@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/uniplaces/logrus"
+	"github.com/pkg/errors"
 )
 
 // defines which levels log stack trace
@@ -22,9 +23,14 @@ type logrusLogger struct {
 	*logrus.Logger
 }
 
+type stackTracer interface {
+	StackTrace() errors.StackTrace
+}
+
 const (
 	stackTraceKey    = "stack_trace"
 	stackTraceFormat = "%s on line %d"
+	stackTraceErrorPkgFormat = "%+v"
 )
 
 func NewLogrusLogger(level string, writer io.Writer) logrusLogger {
@@ -48,32 +54,54 @@ func NewLogrusLogger(level string, writer io.Writer) logrusLogger {
 	return instance
 }
 
-func (logger logrusLogger) ErrorWithFields(message string, fields map[string]interface{}) {
-	entry := logger.entry(fields, stackTraceLevels[logrus.ErrorLevel])
-	entry.Error(message)
+func (logger logrusLogger) ErrorWithFields(err error, fields map[string]interface{}) {
+	var stackTrace []string
+
+	if stackTraceLevels[logrus.ErrorLevel] {
+		if err, ok := err.(stackTracer); ok {
+			for _, f := range err.StackTrace() {
+				stackTrace = append(stackTrace, fmt.Sprintf(stackTraceErrorPkgFormat, f))
+			}
+		} else {
+			stackTrace = buildStackTrace()
+		}
+	}
+
+	entry := logger.entry(fields, stackTrace)
+	entry.Error(err.Error())
 }
 
 func (logger logrusLogger) WarningWithFields(message string, fields map[string]interface{}) {
-	entry := logger.entry(fields, stackTraceLevels[logrus.WarnLevel])
+	var stackTrace []string
+	if stackTraceLevels[logrus.WarnLevel] {
+		stackTrace = buildStackTrace()
+	}
+
+	entry := logger.entry(fields, stackTrace)
 	entry.Warning(message)
 }
 
 func (logger logrusLogger) InfoWithFields(message string, fields map[string]interface{}) {
-	entry := logger.entry(fields, stackTraceLevels[logrus.InfoLevel])
+	var stackTrace []string
+	if stackTraceLevels[logrus.InfoLevel] {
+		stackTrace = buildStackTrace()
+	}
+
+	entry := logger.entry(fields, stackTrace)
 	entry.Info(message)
 }
 
 func (logger logrusLogger) DebugWithFields(message string, fields map[string]interface{}) {
-	entry := logger.entry(fields, stackTraceLevels[logrus.DebugLevel])
-	entry.Debug(message)
-}
-
-func (logger logrusLogger) entry(fields map[string]interface{}, includeStackTrace bool) *logrus.Entry {
 	var stackTrace []string
-	if includeStackTrace {
+	if stackTraceLevels[logrus.DebugLevel] {
 		stackTrace = buildStackTrace()
 	}
 
+	entry := logger.entry(fields, stackTrace)
+	entry.Debug(message)
+}
+
+func (logger logrusLogger) entry(fields map[string]interface{}, stackTrace []string) *logrus.Entry {
 	if len(fields) == 0 {
 		logFields := logrus.Fields{}
 		if len(stackTrace) > 0 {
