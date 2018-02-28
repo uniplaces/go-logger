@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/uniplaces/go-logger/internal"
+	errorsPkg "github.com/pkg/errors"
 )
 
 func TestNew(t *testing.T) {
@@ -38,6 +39,29 @@ func TestLogWithFields(t *testing.T) {
 	resetInstance()
 }
 
+func TestLogWithFieldsAndStacktrace(t *testing.T) {
+	var buffer bytes.Buffer
+	err := InitWithInstance(internal.NewLogrusLogger("error", &buffer))
+	require.Nil(t, err)
+
+	errorWithStackTrace := justToShowUpInStackTrace()
+
+	Builder().
+		AddField("key", "value").
+		AddContextField("foo", "bar").
+		Error(errorWithStackTrace)
+
+	assert.Contains(t, buffer.String(), "\"context\":{\"foo\":\"bar\"}")
+	assert.Contains(t, buffer.String(), "\"key\":\"value\"")
+	assert.Contains(t, buffer.String(), "\"stack_trace\":")
+	// test stack trace strings
+	assert.Contains(t, buffer.String(), "github.com/uniplaces/go-logger.justToShowUpInStackTrace")
+	assert.Contains(t, buffer.String(), "github.com/uniplaces/go-logger.TestLogWithFieldsAndStacktrace")
+	assert.Contains(t, buffer.String(), "github.com/uniplaces/go-logger/logger_test.go:84")
+
+	resetInstance()
+}
+
 func TestLog(t *testing.T) {
 	var buffer bytes.Buffer
 	err := InitWithInstance(internal.NewLogrusLogger("error", &buffer))
@@ -54,4 +78,8 @@ func TestLog(t *testing.T) {
 
 func resetInstance() {
 	instance = nil
+}
+
+func justToShowUpInStackTrace() error {
+	return errorsPkg.New("error test")
 }
