@@ -38,6 +38,15 @@ logger.
     Debug("debug message")
 ```
 
+##### Adding default fields
+```go
+// Normal field
+logger.AddDefaultField("normal-field", "normal_field_value", false)
+
+// Context field
+logger.AddDefaultField("context-field", "context_field_value", true)
+```
+
 ## Guidelines
 This project's main focus is to bring a common standard to our Go projects's logs and, as such, 
 please try to follow these guidelines when using this logger:
