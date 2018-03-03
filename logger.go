@@ -8,8 +8,17 @@ import (
 	"github.com/uniplaces/go-logger/internal"
 )
 
+const logType = "app"
+
 var instance Logger
 var once sync.Once
+var defaultFields []defaultField
+
+type defaultField struct {
+	key            string
+	value          interface{}
+	isContextField bool
+}
 
 // Init initializes logger instance
 func Init(config Config) error {
@@ -22,6 +31,8 @@ func Init(config Config) error {
 		instance = internal.NewLogrusLogger(config.level, os.Stdout)
 	})
 
+	addMandatoryDefaultFields()
+
 	return nil
 }
 
@@ -33,7 +44,13 @@ func InitWithInstance(newInstance Logger) error {
 
 	instance = newInstance
 
+	addMandatoryDefaultFields()
+
 	return nil
+}
+
+func AddDefaultField(key string, value interface{}, isContextField bool) {
+	defaultFields = append(defaultFields, defaultField{key: key, value: value, isContextField: isContextField})
 }
 
 // Error logs a error message
@@ -47,7 +64,7 @@ func (builder builder) Error(err error) {
 		return
 	}
 
-	instance.ErrorWithFields(err, builder.getFieldsWithMandatoryKeys())
+	instance.ErrorWithFields(err, builder.getDefaultFields(defaultFields))
 }
 
 // Warning logs a warning message
@@ -61,7 +78,7 @@ func (builder builder) Warning(message string) {
 		return
 	}
 
-	instance.WarningWithFields(message, builder.getFieldsWithMandatoryKeys())
+	instance.WarningWithFields(message, builder.getDefaultFields(defaultFields))
 }
 
 // Info logs a info message
@@ -75,7 +92,7 @@ func (builder builder) Info(message string) {
 		return
 	}
 
-	instance.InfoWithFields(message, builder.getFieldsWithMandatoryKeys())
+	instance.InfoWithFields(message, builder.getDefaultFields(defaultFields))
 }
 
 // Debug logs a debug message
@@ -89,5 +106,12 @@ func (builder builder) Debug(message string) {
 		return
 	}
 
-	instance.DebugWithFields(message, builder.getFieldsWithMandatoryKeys())
+	instance.DebugWithFields(message, builder.getDefaultFields(defaultFields))
+}
+
+func addMandatoryDefaultFields() {
+	AddDefaultField("type", logType, false)
+	AddDefaultField("app-id", os.Getenv("APPID"), false)
+	AddDefaultField("env", os.Getenv("GOENV"), false)
+	AddDefaultField("git-hash", os.Getenv("GITHASH"), false)
 }
