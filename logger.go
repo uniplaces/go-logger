@@ -49,6 +49,7 @@ func InitWithInstance(newInstance Logger) error {
 	return nil
 }
 
+// AddDefaultField adds data to be set as a field (either normal or context) on all logs
 func AddDefaultField(key string, value interface{}, isContextField bool) {
 	defaultFields = append(defaultFields, defaultField{key: key, value: value, isContextField: isContextField})
 }
