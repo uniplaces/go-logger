@@ -3,12 +3,13 @@ package go_logger
 import (
 	"bytes"
 	"errors"
+	"os"
 	"testing"
 
+	errorsPkg "github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/uniplaces/go-logger/internal"
-	errorsPkg "github.com/pkg/errors"
 )
 
 func TestNew(t *testing.T) {
@@ -39,6 +40,42 @@ func TestLogWithFields(t *testing.T) {
 	resetInstance()
 }
 
+func TestLogWithDefaultFields(t *testing.T) {
+	os.Setenv("APPID", "app_id")
+	os.Setenv("GOENV", "go_env")
+	os.Setenv("GITHASH", "git_hash")
+
+	var buffer bytes.Buffer
+	err := InitWithInstance(internal.NewLogrusLogger("info", &buffer))
+	require.Nil(t, err)
+
+	AddDefaultField("test-field", "field_value", false)
+	AddDefaultField("test-context-field", "context_field_value", true)
+
+	expectedFields := map[string]interface{}{
+		"type":       "app",
+		"env":        "go_env",
+		"git-hash":   "git_hash",
+		"app-id":     "app_id",
+		"test-field": "field_value",
+		"key":        "value",
+		"context": map[string]interface{}{
+			"foo":                "bar",
+			"test-context-field": "context_field_value",
+		},
+	}
+
+	builder := Builder()
+	builder.
+		AddField("key", "value").
+		AddContextField("foo", "bar").
+		Info("info test")
+
+	assert.Equal(t, expectedFields, builder.getFields())
+
+	resetInstance()
+}
+
 func TestLogWithFieldsAndStacktrace(t *testing.T) {
 	var buffer bytes.Buffer
 	err := InitWithInstance(internal.NewLogrusLogger("error", &buffer))
@@ -57,7 +94,7 @@ func TestLogWithFieldsAndStacktrace(t *testing.T) {
 	// test stack trace strings
 	assert.Contains(t, buffer.String(), "github.com/uniplaces/go-logger.justToShowUpInStackTrace")
 	assert.Contains(t, buffer.String(), "github.com/uniplaces/go-logger.TestLogWithFieldsAndStacktrace")
-	assert.Contains(t, buffer.String(), "github.com/uniplaces/go-logger/logger_test.go:84")
+	assert.Contains(t, buffer.String(), "github.com/uniplaces/go-logger/logger_test.go:122")
 
 	resetInstance()
 }
@@ -78,6 +115,7 @@ func TestLog(t *testing.T) {
 
 func resetInstance() {
 	instance = nil
+	defaultFields = []defaultField{}
 }
 
 func justToShowUpInStackTrace() error {

@@ -1,11 +1,6 @@
 package go_logger
 
-import "os"
-
-const (
-	contextFieldsKey = "context"
-	logType          = "app"
-)
+const contextFieldsKey = "context"
 
 type builder struct {
 	fields        map[string]interface{}
@@ -42,12 +37,16 @@ func (builder builder) AddContextField(key string, value interface{}) builder {
 	return builder
 }
 
-func (builder builder) getFieldsWithMandatoryKeys() map[string]interface{} {
-	builder.
-		AddField("type", logType).
-		AddField("app-id", os.Getenv("APPID")).
-		AddField("env", os.Getenv("GOENV")).
-		AddField("git-hash", os.Getenv("GITHASH"))
+func (builder builder) getDefaultFields(fields []defaultField) map[string]interface{} {
+	for _, field := range fields {
+		if field.isContextField {
+			builder.AddContextField(field.key, field.value)
+
+			continue
+		}
+
+		builder.AddField(field.key, field.value)
+	}
 
 	return builder.getFields()
 }
