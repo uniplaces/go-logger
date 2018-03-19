@@ -7,8 +7,8 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/uniplaces/logrus"
 	"github.com/pkg/errors"
+	"github.com/uniplaces/logrus"
 )
 
 // defines which levels log stack trace
@@ -28,8 +28,8 @@ type stackTracer interface {
 }
 
 const (
-	stackTraceKey    = "stack_trace"
-	stackTraceFormat = "%s:%d"
+	stackTraceKey            = "stack_trace"
+	stackTraceFormat         = "%s:%d"
 	stackTraceErrorPkgFormat = "%+v"
 )
 
@@ -44,7 +44,10 @@ func NewLogrusLogger(level string, writer io.Writer) logrusLogger {
 	}
 
 	instance.Formatter = &logrus.JSONFormatter{
-		EnableIntLogLevels:true,
+		EnableIntLogLevels: true,
+		FieldMap: logrus.FieldMap{
+			logrus.FieldKeyMsg: "short_message",
+		},
 	}
 	instance.Level = logrusLevel
 	instance.Out = writer
