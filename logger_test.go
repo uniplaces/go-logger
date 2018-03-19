@@ -95,7 +95,7 @@ func TestLogWithFieldsAndStacktrace(t *testing.T) {
 	// test stack trace strings
 	assert.Contains(t, buffer.String(), "github.com/uniplaces/go-logger.justToShowUpInStackTrace")
 	assert.Contains(t, buffer.String(), "github.com/uniplaces/go-logger.TestLogWithFieldsAndStacktrace")
-	assert.Contains(t, buffer.String(), "github.com/uniplaces/go-logger/logger_test.go:124")
+	assert.Contains(t, buffer.String(), "github.com/uniplaces/go-logger/logger_test.go:123")
 
 	resetInstance()
 }
