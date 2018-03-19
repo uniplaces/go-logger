@@ -115,4 +115,5 @@ func addMandatoryDefaultFields() {
 	AddDefaultField("app-id", os.Getenv("APPID"), false)
 	AddDefaultField("env", os.Getenv("GOENV"), false)
 	AddDefaultField("git-hash", os.Getenv("GITHASH"), false)
+	AddDefaultField("version", "1.1", false)
 }
