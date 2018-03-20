@@ -63,7 +63,6 @@ func TestLogWithDefaultFields(t *testing.T) {
 			"foo":                "bar",
 			"test-context-field": "context_field_value",
 		},
-		"version": "1.1",
 	}
 
 	builder := Builder()
