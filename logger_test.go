@@ -63,7 +63,6 @@ func TestLogWithDefaultFields(t *testing.T) {
 			"foo":                "bar",
 			"test-context-field": "context_field_value",
 		},
-		"version": "1.1",
 	}
 
 	builder := Builder()
@@ -95,7 +94,7 @@ func TestLogWithFieldsAndStacktrace(t *testing.T) {
 	// test stack trace strings
 	assert.Contains(t, buffer.String(), "github.com/uniplaces/go-logger.justToShowUpInStackTrace")
 	assert.Contains(t, buffer.String(), "github.com/uniplaces/go-logger.TestLogWithFieldsAndStacktrace")
-	assert.Contains(t, buffer.String(), "github.com/uniplaces/go-logger/logger_test.go:123")
+	assert.Contains(t, buffer.String(), "github.com/uniplaces/go-logger/logger_test.go:122")
 
 	resetInstance()
 }
