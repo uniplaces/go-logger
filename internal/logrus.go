@@ -177,11 +177,11 @@ func firstStackTracerInErrorChain(err error) error {
 		}
 
 		if _, ok := err.(stackTracer); ok {
-			return err
+			break
 		}
 
 		err = cause.Cause()
 	}
 
-	return nil
+	return err
 }
