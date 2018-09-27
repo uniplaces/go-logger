@@ -86,7 +86,18 @@ func TestLogrusLoggerInvalidConfig(t *testing.T) {
 	NewLogrusLogger("invalid level", nil)
 }
 
-func TestFirstStackTracerInErrorChain(t *testing.T) {
+func TestFirstStackTracerInErrorChainWithOneError(t *testing.T) {
+	rootError := errors.New("root error")
+
+	_, ok := rootError.(stackTracer)
+	assert.True(t, ok)
+
+	gotError := firstStackTracerInErrorChain(rootError)
+
+	assert.Equal(t, "root error", gotError.Error())
+}
+
+func TestFirstStackTracerInErrorChainWithMultipleErrors(t *testing.T) {
 	rootError := errors.New("root error")
 	stackTracerError := errors.Wrap(rootError, "wrap root error")
 	newContextError := errors.WithMessage(stackTracerError, "new context added")
