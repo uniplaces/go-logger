@@ -27,6 +27,10 @@ type stackTracer interface {
 	StackTrace() errors.StackTrace
 }
 
+type causer interface {
+	Cause() error
+}
+
 const (
 	stackTraceKey    = "stack_trace"
 	stackTraceFormat = "%s:%d"
@@ -94,7 +98,7 @@ func (logger logrusLogger) DebugWithFields(message string, fields map[string]int
 func (logger logrusLogger) getErrorLevelStackTrace(err error) []string {
 	var stackTrace []string
 	if stackTraceLevels[logrus.ErrorLevel] {
-		switch err := err.(type) {
+		switch err := firstStackTracerInErrorChain(err).(type) {
 		case stackTracer:
 			for _, frame := range err.StackTrace() {
 				stackTrace = append(stackTrace, fmt.Sprintf(stackTraceErrorPkgFormat, frame))
@@ -163,4 +167,21 @@ func shouldSkipFile(file string) bool {
 	}
 
 	return false
+}
+
+func firstStackTracerInErrorChain(err error) error {
+	for err != nil {
+		cause, ok := err.(causer)
+		if !ok {
+			break
+		}
+
+		if _, ok := err.(stackTracer); ok {
+			break
+		}
+
+		err = cause.Cause()
+	}
+
+	return err
 }

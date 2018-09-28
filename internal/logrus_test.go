@@ -3,9 +3,9 @@ package internal
 import (
 	"bytes"
 	"testing"
-	"errors"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/pkg/errors"
 )
 
 func TestLogrusLoggerLevel(t *testing.T) {
@@ -84,4 +84,28 @@ func TestLogrusLoggerInvalidConfig(t *testing.T) {
 	}()
 
 	NewLogrusLogger("invalid level", nil)
+}
+
+func TestFirstStackTracerInErrorChainWithOneError(t *testing.T) {
+	rootError := errors.New("root error")
+
+	_, ok := rootError.(stackTracer)
+	assert.True(t, ok)
+
+	gotError := firstStackTracerInErrorChain(rootError)
+
+	assert.EqualError(t, gotError, rootError.Error())
+}
+
+func TestFirstStackTracerInErrorChainWithMultipleErrors(t *testing.T) {
+	rootError := errors.New("root error")
+	stackTracerError := errors.Wrap(rootError, "wrap root error")
+	newContextError := errors.WithMessage(stackTracerError, "new context added")
+
+	gotError := firstStackTracerInErrorChain(newContextError)
+
+	_, ok := gotError.(stackTracer)
+	assert.True(t, ok)
+
+	assert.EqualError(t, gotError, stackTracerError.Error())
 }
