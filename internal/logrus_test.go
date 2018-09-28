@@ -94,7 +94,7 @@ func TestFirstStackTracerInErrorChainWithOneError(t *testing.T) {
 
 	gotError := firstStackTracerInErrorChain(rootError)
 
-	assert.Equal(t, "root error", gotError.Error())
+	assert.EqualError(t, gotError, rootError.Error())
 }
 
 func TestFirstStackTracerInErrorChainWithMultipleErrors(t *testing.T) {
@@ -102,10 +102,10 @@ func TestFirstStackTracerInErrorChainWithMultipleErrors(t *testing.T) {
 	stackTracerError := errors.Wrap(rootError, "wrap root error")
 	newContextError := errors.WithMessage(stackTracerError, "new context added")
 
-	_, ok := newContextError.(stackTracer)
-	assert.False(t, ok)
-
 	gotError := firstStackTracerInErrorChain(newContextError)
 
-	assert.Equal(t, "wrap root error: root error", gotError.Error())
+	_, ok := gotError.(stackTracer)
+	assert.True(t, ok)
+
+	assert.EqualError(t, gotError, stackTracerError.Error())
 }
