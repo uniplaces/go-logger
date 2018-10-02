@@ -25,7 +25,7 @@ func TestNew(t *testing.T) {
 
 func TestLogWithFields(t *testing.T) {
 	var buffer bytes.Buffer
-	err := InitWithInstance(internal.NewLogrusLogger("error", &buffer))
+	err := InitWithInstance(internal.NewLogrusLogger("error", "staging", &buffer, map[string]interface{}{}))
 	require.Nil(t, err)
 
 	Builder().
@@ -46,7 +46,7 @@ func TestLogWithDefaultFields(t *testing.T) {
 	os.Setenv("GITHASH", "git_hash")
 
 	var buffer bytes.Buffer
-	err := InitWithInstance(internal.NewLogrusLogger("info", &buffer))
+	err := InitWithInstance(internal.NewLogrusLogger("info", "staging", &buffer, map[string]interface{}{}))
 	require.Nil(t, err)
 
 	AddDefaultField("test-field", "field_value", false)
@@ -78,7 +78,7 @@ func TestLogWithDefaultFields(t *testing.T) {
 
 func TestLogWithFieldsAndStacktrace(t *testing.T) {
 	var buffer bytes.Buffer
-	err := InitWithInstance(internal.NewLogrusLogger("error", &buffer))
+	err := InitWithInstance(internal.NewLogrusLogger("error", "staging", &buffer, map[string]interface{}{}))
 	require.Nil(t, err)
 
 	errorWithStackTrace := justToShowUpInStackTrace()
@@ -101,7 +101,7 @@ func TestLogWithFieldsAndStacktrace(t *testing.T) {
 
 func TestLog(t *testing.T) {
 	var buffer bytes.Buffer
-	err := InitWithInstance(internal.NewLogrusLogger("error", &buffer))
+	err := InitWithInstance(internal.NewLogrusLogger("error", "staging", &buffer, map[string]interface{}{}))
 	require.Nil(t, err)
 
 	Error(errors.New("test error"))
@@ -115,7 +115,7 @@ func TestLog(t *testing.T) {
 
 func resetInstance() {
 	instance = nil
-	defaultFields = []DefaultField{}
+	defaultFields = []defaultField{}
 }
 
 func justToShowUpInStackTrace() error {
