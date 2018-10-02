@@ -28,7 +28,7 @@ func Init(config Config) error {
 
 	once.Do(func() {
 		// todo use implementation according to the env
-		instance = internal.NewLogrusLogger(config.level, os.Stdout)
+		instance = internal.NewLogrusLogger(config.level, config.environment, os.Stdout)
 	})
 
 	addMandatoryDefaultFields()

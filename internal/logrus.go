@@ -7,8 +7,8 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/uniplaces/logrus"
 	"github.com/pkg/errors"
+	"github.com/uniplaces/logrus"
 )
 
 // defines which levels log stack trace
@@ -32,12 +32,17 @@ type causer interface {
 }
 
 const (
-	stackTraceKey    = "stack_trace"
-	stackTraceFormat = "%s:%d"
+	stackTraceKey            = "stack_trace"
+	stackTraceFormat         = "%s:%d"
 	stackTraceErrorPkgFormat = "%+v"
 )
 
-func NewLogrusLogger(level string, writer io.Writer) logrusLogger {
+const (
+	devEnvironment  = "dev"
+	testEnvironment = "test"
+)
+
+func NewLogrusLogger(level string, environment string, writer io.Writer) logrusLogger {
 	logrusLevel, err := logrus.ParseLevel(level)
 	if err != nil {
 		panic(fmt.Sprintf("invalid log level (%s)", level))
@@ -47,15 +52,25 @@ func NewLogrusLogger(level string, writer io.Writer) logrusLogger {
 		Logger: logrus.New(),
 	}
 
-	instance.Formatter = &logrus.JSONFormatter{
-		EnableIntLogLevels:true,
-	}
+	instance.Formatter = getFormatter(environment)
 	instance.Level = logrusLevel
 	instance.Out = writer
 
 	log.SetOutput(instance.Writer())
 
 	return instance
+}
+
+func getFormatter(environment string) logrus.Formatter {
+	if environment == devEnvironment || environment == testEnvironment {
+		return &logrus.TextFormatter{
+			EnableIntLogLevels: true,
+		}
+	}
+
+	return &logrus.JSONFormatter{
+		EnableIntLogLevels: true,
+	}
 }
 
 func (logger logrusLogger) ErrorWithFields(err error, fields map[string]interface{}) {
