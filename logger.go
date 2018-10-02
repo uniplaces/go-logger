@@ -26,12 +26,16 @@ func Init(config Config) error {
 		return errors.New("logger cannot be initialized more than once")
 	}
 
-	once.Do(func() {
-		// todo use implementation according to the env
-		instance = internal.NewLogrusLogger(config.level, os.Stdout)
-	})
-
 	addMandatoryDefaultFields()
+
+	once.Do(func() {
+		instance = internal.NewLogrusLogger(
+			config.level,
+			config.environment,
+			os.Stdout,
+			Builder().getDefaultFields(defaultFields),
+		)
+	})
 
 	return nil
 }
