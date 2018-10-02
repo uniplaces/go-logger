@@ -115,7 +115,7 @@ func TestLog(t *testing.T) {
 
 func resetInstance() {
 	instance = nil
-	defaultFields = []defaultField{}
+	defaultFields = []DefaultField{}
 }
 
 func justToShowUpInStackTrace() error {

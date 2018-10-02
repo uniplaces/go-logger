@@ -42,7 +42,7 @@ const (
 	testEnvironment = "test"
 )
 
-func NewLogrusLogger(level string, environment string, writer io.Writer) logrusLogger {
+func NewLogrusLogger(level string, env string, writer io.Writer, defaultFields map[string]interface{}) logrusLogger {
 	logrusLevel, err := logrus.ParseLevel(level)
 	if err != nil {
 		panic(fmt.Sprintf("invalid log level (%s)", level))
@@ -52,17 +52,17 @@ func NewLogrusLogger(level string, environment string, writer io.Writer) logrusL
 		Logger: logrus.New(),
 	}
 
-	instance.Formatter = getFormatter(environment)
+	instance.Formatter = getFormatter(env)
 	instance.Level = logrusLevel
 	instance.Out = writer
 
-	log.SetOutput(instance.Writer())
+	log.SetOutput(instance.WithFields(defaultFields).Writer())
 
 	return instance
 }
 
-func getFormatter(environment string) logrus.Formatter {
-	if environment == devEnvironment || environment == testEnvironment {
+func getFormatter(env string) logrus.Formatter {
+	if env == devEnvironment || env == testEnvironment {
 		return &logrus.TextFormatter{
 			EnableIntLogLevels: true,
 		}

@@ -26,12 +26,16 @@ func Init(config Config) error {
 		return errors.New("logger cannot be initialized more than once")
 	}
 
-	once.Do(func() {
-		// todo use implementation according to the env
-		instance = internal.NewLogrusLogger(config.level, config.environment, os.Stdout)
-	})
-
 	addMandatoryDefaultFields()
+
+	once.Do(func() {
+		instance = internal.NewLogrusLogger(
+			config.level,
+			config.environment,
+			os.Stdout,
+			Builder().getDefaultFields(defaultFields),
+		)
+	})
 
 	return nil
 }
@@ -51,7 +55,7 @@ func InitWithInstance(newInstance Logger) error {
 
 // AddDefaultField adds data to be set as a field (either normal or context) on all logs
 func AddDefaultField(key string, value interface{}, isContextField bool) {
-	defaultFields = append(defaultFields, defaultField{key: key, value: value, isContextField: isContextField})
+	defaultFields = append(defaultFields, DefaultField{key: key, value: value, isContextField: isContextField})
 }
 
 // Error logs a error message
