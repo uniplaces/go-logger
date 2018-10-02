@@ -37,7 +37,7 @@ func (builder builder) AddContextField(key string, value interface{}) builder {
 	return builder
 }
 
-func (builder builder) getDefaultFields(fields []DefaultField) map[string]interface{} {
+func (builder builder) getDefaultFields(fields []defaultField) map[string]interface{} {
 	for _, field := range fields {
 		if field.isContextField {
 			builder.AddContextField(field.key, field.value)
