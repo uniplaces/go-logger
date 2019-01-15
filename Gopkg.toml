@@ -1,6 +1,6 @@
 [[constraint]]
   name = "github.com/uniplaces/logrus"
-  revision = "e3e67f834921ddd1bb3ef5594e139d631899e11d"
+  version = "v1.1.0"
 
 [[constraint]]
   name = "github.com/stretchr/testify"
