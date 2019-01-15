@@ -4,15 +4,15 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestLogrusLoggerLevel(t *testing.T) {
 	t.Parallel()
 
 	var buffer bytes.Buffer
-	l := NewLogrusLogger("warning", &buffer)
+	l := NewLogrusLogger("warning", "dev", &buffer, nil)
 	l.Info("test info")
 	l.Debug("test debug")
 
@@ -20,8 +20,8 @@ func TestLogrusLoggerLevel(t *testing.T) {
 
 	l.Error("test error")
 
-	assert.Contains(t, buffer.String(), "\"level\":2")
-	assert.Contains(t, buffer.String(), "\"msg\":\"test error\"")
+	assert.Contains(t, buffer.String(), "level=2")
+	assert.Contains(t, buffer.String(), "msg=\"test error\"")
 }
 
 func TestLogrusLoggerStackTrace(t *testing.T) {
@@ -29,7 +29,7 @@ func TestLogrusLoggerStackTrace(t *testing.T) {
 
 	var zeroValueFields map[string]interface{}
 	var buffer bytes.Buffer
-	l := NewLogrusLogger("debug", &buffer)
+	l := NewLogrusLogger("debug", "dev", &buffer, nil)
 
 	l.DebugWithFields("debug", zeroValueFields)
 	assert.NotContains(t, buffer.String(), "stack_trace")
@@ -67,13 +67,13 @@ func TestLogrusLoggerWithFields(t *testing.T) {
 	t.Parallel()
 
 	var buffer bytes.Buffer
-	l := NewLogrusLogger("warning", &buffer)
+	l := NewLogrusLogger("warning", "dev", &buffer, map[string]interface{}{})
 
 	l.DebugWithFields("debug", map[string]interface{}{"test": 123})
 	assert.Empty(t, buffer.String())
 
 	l.WarningWithFields("warning", map[string]interface{}{"abc": 321})
-	assert.Contains(t, buffer.String(), "\"abc\":321")
+	assert.Contains(t, buffer.String(), "abc=321")
 }
 
 func TestLogrusLoggerInvalidConfig(t *testing.T) {
@@ -83,7 +83,7 @@ func TestLogrusLoggerInvalidConfig(t *testing.T) {
 		assert.NotNil(t, recover())
 	}()
 
-	NewLogrusLogger("invalid level", nil)
+	NewLogrusLogger("invalid level", "dev", nil, nil)
 }
 
 func TestFirstStackTracerInErrorChainWithOneError(t *testing.T) {
