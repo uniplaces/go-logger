@@ -52,25 +52,13 @@ func NewLogrusLogger(level string, env string, writer io.Writer, defaultFields m
 		Logger: logrus.New(),
 	}
 
-	instance.Formatter = getFormatter(env)
+	instance.Formatter = &logrus.JSONFormatter{}
 	instance.Level = logrusLevel
 	instance.Out = writer
 
 	log.SetOutput(instance.WithFields(defaultFields).Writer())
 
 	return instance
-}
-
-func getFormatter(env string) logrus.Formatter {
-	if env == devEnvironment || env == testEnvironment {
-		return &logrus.TextFormatter{
-			EnableIntLogLevels: true,
-		}
-	}
-
-	return &logrus.JSONFormatter{
-		EnableIntLogLevels: true,
-	}
 }
 
 func (logger logrusLogger) ErrorWithFields(err error, fields map[string]interface{}) {
