@@ -1,0 +1,25 @@
+name: Formatter
+
+on: workflow_call
+
+jobs:
+  fmt:
+    name: Formatter
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.6'
+
+      - name: Run formatter
+        run: go fmt ./...
+
+      - name: Apply formatter changes
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: Apply Go fmt changes [skip ci]

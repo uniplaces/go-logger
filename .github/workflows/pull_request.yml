@@ -1,0 +1,13 @@
+name: PR Checks
+
+on: pull_request
+
+jobs:
+  fmt:
+    name: Formatter
+    uses: ./.github/workflows/formatter.yml
+
+  tests:
+    name: Tests
+    uses: ./.github/workflows/tests.yml
+    secrets: inherit
