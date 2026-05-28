@@ -53,7 +53,7 @@ func TestBuilder_GetFields(t *testing.T) {
 }
 
 func TestLogBuilderTypeAliasIsExported(t *testing.T) {
-	var b LogBuilder = Builder() //nolint:staticcheck // proves the alias is namable from outside
+	var b LogBuilder = Builder() // alias compiles and is assignable; external naming is exercised in requestcontext
 
 	b = b.AddField("k", "v")
 
