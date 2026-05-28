@@ -15,6 +15,9 @@ import (
 	"github.com/uniplaces/go-logger/requestcontext"
 )
 
+// testBuf is shared across all tests in this file. Tests must not call t.Parallel(),
+// and each test must testBuf.Reset() before the log call under test so decodeLastLine
+// returns only that test's output.
 var testBuf bytes.Buffer
 
 func TestMain(m *testing.M) {
