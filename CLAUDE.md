@@ -10,7 +10,8 @@ Consumed via `import logger "github.com/uniplaces/go-logger"`. Module path
 
 ## Who consumes this
 
-All 10 Go services pin `v0.7.0` (the current latest tag) in `go.mod`:
+All 10 Go services currently pin `v0.7.0` in `go.mod` and continue to work bit-for-bit on
+that surface. `v0.8.0` is opt-in; consumers bump when they're ready to use `requestcontext`.
 
 | Service | Typical use |
 |---|---|
@@ -141,8 +142,10 @@ RFC3164-compliance related. Log shipping (Graylog) depends on the formatter beha
 
 ## Versioning
 
-Tags are sequential semver-ish. Latest is `v0.7.0`. Consumer pinning is done by `go.mod`
-require line, e.g. `github.com/uniplaces/go-logger v0.7.0`.
+Tags are sequential semver-ish. Latest is `v0.8.0` (adds `requestcontext` + `go.mod`).
+Consumer pinning is done by `go.mod` require line, e.g.
+`github.com/uniplaces/go-logger v0.8.0`. Services that have not adopted `requestcontext`
+remain pinned to `v0.7.0`.
 
 **Backward compatibility:** field names in JSON output are part of the contract — log
 shippers, dashboards, and alerting rules grep on `app-id`, `env`, `git-hash`, `type`,
