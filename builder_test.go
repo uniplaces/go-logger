@@ -51,3 +51,11 @@ func TestBuilder_GetFields(t *testing.T) {
 
 	assert.Equal(t, expectedFields, builder.getFields())
 }
+
+func TestLogBuilderTypeAliasIsExported(t *testing.T) {
+	var b LogBuilder = Builder() //nolint:staticcheck // proves the alias is namable from outside
+
+	b = b.AddField("k", "v")
+
+	assert.Equal(t, "v", b.fields["k"])
+}
