@@ -9,10 +9,7 @@ type roundTripper struct {
 	base http.RoundTripper
 }
 
-// RoundTripper wraps base so every outbound request carries HeaderName when
-// its context has a request id and the header is not already set. If base
-// is nil, http.DefaultTransport is used. The wrapper clones the request
-// before mutating headers — never modifies the caller's *http.Request.
+// RoundTripper wraps base so outbound requests carry HeaderName from ctx; nil base uses http.DefaultTransport.
 func RoundTripper(base http.RoundTripper) http.RoundTripper {
 	if base == nil {
 		base = http.DefaultTransport
@@ -31,19 +28,21 @@ func (r roundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 	return r.base.RoundTrip(req)
 }
 
-// WrapClient sets client.Transport = RoundTripper(client.Transport) and
-// returns the same *http.Client. Use at HTTP-client construction time.
+// WrapClient returns a shallow copy of client with its Transport wrapped; the input is never mutated.
 func WrapClient(client *http.Client) *http.Client {
-	client.Transport = RoundTripper(client.Transport)
+	if client == nil {
+		client = http.DefaultClient
+	}
 
-	return client
+	wrapped := *client
+	wrapped.Transport = RoundTripper(client.Transport)
+
+	return &wrapped
 }
 
-// InjectHTTPHeader sets HeaderName on h when ctx has a request id. Escape
-// hatch for code paths that build a raw *http.Request without going
-// through a wrapped client.
-func InjectHTTPHeader(ctx context.Context, h http.Header) {
+// InjectHTTPHeader sets HeaderName on header when ctx has a request id.
+func InjectHTTPHeader(ctx context.Context, header http.Header) {
 	if id := ID(ctx); id != "" {
-		h.Set(HeaderName, id)
+		header.Set(HeaderName, id)
 	}
 }

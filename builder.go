@@ -1,5 +1,10 @@
 package go_logger
 
+import (
+	"errors"
+	"fmt"
+)
+
 const contextFieldsKey = "context"
 
 type builder struct {
@@ -71,4 +76,15 @@ func (builder builder) getFields() map[string]interface{} {
 	}
 
 	return fields
+}
+
+// EmitFailure terminates the builder at error level, logging the wrapped err or just reason when err is nil.
+func (builder builder) EmitFailure(reason string, err error) {
+	if err != nil {
+		builder.AddField("error_message", err.Error()).Error(fmt.Errorf("%s: %w", reason, err))
+
+		return
+	}
+
+	builder.Error(errors.New(reason))
 }

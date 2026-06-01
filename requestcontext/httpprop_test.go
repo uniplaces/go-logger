@@ -113,15 +113,26 @@ func TestRoundTripperDoesNotMutateRequest(t *testing.T) {
 		"the caller's request header must not be mutated")
 }
 
-func TestWrapClientReturnsSameClient(t *testing.T) {
+func TestWrapClientReturnsCopyWithoutMutatingInput(t *testing.T) {
 	t.Parallel()
 
 	c := &http.Client{}
 
 	got := requestcontext.WrapClient(c)
 
-	assert.Same(t, c, got)
-	assert.NotNil(t, c.Transport, "WrapClient must set Transport")
+	assert.NotSame(t, c, got, "WrapClient must return a copy, not the input client")
+	assert.NotNil(t, got.Transport, "wrapped client must have Transport set")
+	assert.Nil(t, c.Transport, "the input client must not be mutated")
+}
+
+func TestWrapClientNilDefaultsToCopy(t *testing.T) {
+	t.Parallel()
+
+	got := requestcontext.WrapClient(nil)
+
+	assert.NotNil(t, got)
+	assert.NotNil(t, got.Transport, "wrapped client must have Transport set")
+	assert.Nil(t, http.DefaultClient.Transport, "http.DefaultClient must not be mutated")
 }
 
 func TestInjectHTTPHeaderSetsWhenIDPresent(t *testing.T) {

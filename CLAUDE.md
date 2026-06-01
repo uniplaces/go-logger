@@ -40,6 +40,7 @@ logger.Debug(msg)
 // Builder terminals:
 b := logger.Builder().AddField("k", v).AddContextField("ck", cv)
 b.Error(err) / b.Warning(msg) / b.Info(msg) / b.Debug(msg)
+b.EmitFailure(reason, err)   // error-level terminal: logs wrapped err, or just reason when err is nil
 
 // Logger interface (interface.go) — what InitWithInstance accepts:
 type Logger interface {
@@ -179,7 +180,8 @@ can adopt it.
 | `Ensure(ctx) (ctx, id)` | Mint a UUIDv4 when the id is absent; idempotent when present |
 | `WithFields(ctx)` | Attach an empty mutable field bag to ctx — call once at the request boundary |
 | `Set(ctx, k, v)` | Add to the field bag; concurrency-safe; no-op when `WithFields` not called |
-| `Snapshot(ctx)` | Shallow copy of the bag; never nil |
+| `IterateFields(ctx, fn)` | Read each bag field in place under the read lock; no allocation (hot-path read) |
+| `Snapshot(ctx)` | Shallow copy of the bag; never nil (use when an isolated copy is needed) |
 | `Logger(ctx) LogBuilder` | `logger.Builder()` pre-populated with `request_id` + bag fields |
 | `HTTPFailure(ctx, component, url, status, err, reason)` | Origin-log helper for HTTP-adapter failures |
 | `QueryFailure(ctx, component, queryID, err, reason)` | Origin-log helper for DB query failures |
@@ -191,14 +193,18 @@ can adopt it.
 The bag is a `*sync.RWMutex`-guarded map stashed once on the context by `WithFields`. Child
 contexts derived via `context.WithValue` / `context.WithCancel` / etc. share the same bag
 pointer — code deep in a handler can `Set(ctx, ...)` and a request-line emitter holding the
-parent ctx sees it. `Snapshot` returns a copy so callers can't accidentally mutate the bag.
+parent ctx sees it. `IterateFields` reads the bag in place under the read lock and is what
+`Logger(ctx)` uses per log line (no per-call allocation); `Snapshot` returns a copy for the
+rarer case where a caller needs an isolated map that outlives the lock.
 
 ### Outbound propagation
 
-`WrapClient(httpClient)` mutates `httpClient.Transport` once at construction. From then on,
-any outbound request carries `X-Request-Id` when its context has one. Pre-set headers are not
-overwritten — callers retain an explicit override. The wrapper clones the request before
-mutating headers, so the caller's `*http.Request` is never modified.
+`WrapClient(httpClient)` returns a shallow copy of the client with its `Transport` wrapped; the
+input client is never mutated, so passing `http.DefaultClient` is safe (a nil client defaults to
+`http.DefaultClient`). From then on, any outbound request through the returned client carries
+`X-Request-Id` when its context has one. Pre-set headers are not overwritten — callers retain an
+explicit override. The wrapper also clones the request before mutating headers, so the caller's
+`*http.Request` is never modified.
 
 ### `LogBuilder` type alias
 

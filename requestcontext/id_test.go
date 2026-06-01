@@ -21,6 +21,23 @@ func TestIDAbsentReturnsEmpty(t *testing.T) {
 	assert.Equal(t, "", ID(context.Background()))
 }
 
+func TestWithIDEmptyIsIgnored(t *testing.T) {
+	t.Parallel()
+
+	ctx := WithID(context.Background(), "")
+
+	assert.Equal(t, "", ID(ctx))
+}
+
+func TestWithIDEmptyDoesNotClobberExisting(t *testing.T) {
+	t.Parallel()
+
+	ctx := WithID(context.Background(), "keep-me")
+	ctx = WithID(ctx, "")
+
+	assert.Equal(t, "keep-me", ID(ctx))
+}
+
 func TestEnsureMintsUUIDWhenAbsent(t *testing.T) {
 	t.Parallel()
 

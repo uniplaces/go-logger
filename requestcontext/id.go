@@ -1,6 +1,4 @@
-// Package requestcontext carries per-request correlation id and structured
-// fields through context.Context, and provides origin-level failure helpers
-// + outbound HTTP propagation for Uniplaces Go services.
+// Package requestcontext carries per-request id and fields through context.Context and propagates them over HTTP.
 package requestcontext
 
 import (
@@ -14,9 +12,12 @@ const HeaderName = "X-Request-Id"
 
 type idCtxKey struct{}
 
-// WithID returns a new context carrying the given request id. Use at the
-// request boundary once the id is known (header read, SQS message id, etc.).
+// WithID returns ctx carrying requestID; an empty requestID is ignored and ctx is returned unchanged.
 func WithID(ctx context.Context, requestID string) context.Context {
+	if requestID == "" {
+		return ctx
+	}
+
 	return context.WithValue(ctx, idCtxKey{}, requestID)
 }
 
@@ -29,10 +30,7 @@ func ID(ctx context.Context) string {
 	return ""
 }
 
-// Ensure returns a context with a request id attached. If ctx already has
-// one, ctx is returned unchanged. Otherwise a UUIDv4 is minted and attached.
-// Use at the entry point of a non-HTTP request path (SQS handler, CLI item
-// loop, scheduled job) where there is no inbound header to honour.
+// Ensure returns ctx with a request id, minting a UUIDv4 when absent; idempotent when present.
 func Ensure(ctx context.Context) (context.Context, string) {
 	if id := ID(ctx); id != "" {
 		return ctx, id

@@ -84,3 +84,28 @@ func TestQueryFailure(t *testing.T) {
 	assert.Equal(t, "connection refused", got["error_message"])
 	assert.Equal(t, "mysql query failed: connection refused", got["msg"])
 }
+
+func TestQueryFailureWithoutError(t *testing.T) {
+	testBuf.Reset()
+
+	ctx := requestcontext.WithID(context.Background(), "req-fail-4")
+
+	requestcontext.QueryFailure(
+		ctx,
+		"mysql",
+		"open_api_excluded_offers.select",
+		nil,
+		"mysql query returned no rows",
+	)
+
+	got := decodeLastLine(t)
+	assert.Equal(t, "error", got["level"])
+	assert.Equal(t, "req-fail-4", got["request_id"])
+	assert.Equal(t, "open_api_excluded_offers.select", got["query"])
+	assert.Equal(t, "mysql query returned no rows", got["reason"])
+
+	_, hasErrMsg := got["error_message"]
+	assert.False(t, hasErrMsg, "error_message should be omitted when err is nil")
+
+	assert.Equal(t, "mysql query returned no rows", got["msg"])
+}

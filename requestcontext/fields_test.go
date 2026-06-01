@@ -52,6 +52,35 @@ func TestFieldsSharedAcrossDerivedContexts(t *testing.T) {
 	assert.Equal(t, true, Snapshot(parent)["from-child"])
 }
 
+func TestIterateFields(t *testing.T) {
+	t.Parallel()
+
+	ctx := WithFields(context.Background())
+	Set(ctx, "a", 1)
+	Set(ctx, "b", "two")
+
+	got := map[string]any{}
+
+	IterateFields(ctx, func(k string, v any) {
+		got[k] = v
+	})
+
+	assert.Equal(t, 1, got["a"])
+	assert.Equal(t, "two", got["b"])
+}
+
+func TestIterateFieldsNoopWhenAbsent(t *testing.T) {
+	t.Parallel()
+
+	called := false
+
+	IterateFields(context.Background(), func(_ string, _ any) {
+		called = true
+	})
+
+	assert.False(t, called)
+}
+
 func TestFieldsSnapshotIsACopy(t *testing.T) {
 	t.Parallel()
 
