@@ -1,0 +1,41 @@
+name: Tests
+
+on:
+  workflow_call:
+    inputs:
+      git-hash:
+        type: string
+
+env:
+  GIT_CONFIG_URL: >-
+    url."https://${{ secrets.ORG_PRIVATE_GITHUB_TOKEN }}:x-oauth-basic@github.com/uniplaces".insteadOf
+    "https://github.com/uniplaces"
+
+jobs:
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.git-hash || github.sha }}
+
+      - name: Setup Go
+        id: setup-go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.6'
+
+      - name: Allow access to private repos
+        run: git config --global ${{ env.GIT_CONFIG_URL }}
+
+      - name: Install dependencies
+        if: steps.setup-go.outputs.cache-hit != 'true'
+        run: go get -t ./...
+
+      - name: Run tests
+        run: go test -race -cover -count=1 ./...
+        env:
+          CGO_ENABLED: 1

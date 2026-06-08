@@ -10,7 +10,8 @@ Consumed via `import logger "github.com/uniplaces/go-logger"`. Module path
 
 ## Who consumes this
 
-All 10 Go services pin `v0.7.0` (the current latest tag) in `go.mod`:
+All 10 Go services currently pin `v0.7.0` in `go.mod` and continue to work bit-for-bit on
+that surface. `v0.8.0` is opt-in; consumers bump when they're ready to use `requestcontext`.
 
 | Service | Typical use |
 |---|---|
@@ -18,7 +19,8 @@ All 10 Go services pin `v0.7.0` (the current latest tag) in `go.mod`:
 | `search-ingestors` | CLI entry log, per-message handler logs, bulk ETL progress |
 | `salesforce-integration`, `integrations-enricher-backend`, `offer-aggregate-cdn-version-updater` | CLI / SQS-worker logging |
 
-`v0.7.0` (commit `35fcd72`, Jan 2020) is the latest release.
+`v0.7.0` (commit `35fcd72`, Jan 2020) is the last release on the legacy surface; `v0.8.0`
+adds the `requestcontext` sub-package (see below) plus a `go.mod` for the repo.
 
 ## Public surface
 
@@ -38,6 +40,7 @@ logger.Debug(msg)
 // Builder terminals:
 b := logger.Builder().AddField("k", v).AddContextField("ck", cv)
 b.Error(err) / b.Warning(msg) / b.Info(msg) / b.Debug(msg)
+b.EmitFailure(reason, err)   // error-level terminal: logs wrapped err, or just reason when err is nil
 
 // Logger interface (interface.go) — what InitWithInstance accepts:
 type Logger interface {
@@ -119,18 +122,18 @@ in this repo use it with `internal.NewLogrusLogger(level, env, &bytes.Buffer{}, 
 
 Boot-time wiring is the only valid mutation point for `instance`.
 
-## Dependency tooling — `dep`
+## Dependency tooling
 
-This repo predates Go modules. The dep manifests are checked in:
+Since `v0.8.0` the repo ships a `go.mod` (Go 1.25) alongside the legacy `dep` manifests
+(`Gopkg.toml`, `Gopkg.lock`, kept as historical artifact — no consumer references them).
+Direct dependencies declared in `go.mod`:
 
-```
-Gopkg.toml   constraints (logrus v1.1.0, testify 1.2.0, pkg/errors 0.8.0)
-Gopkg.lock   resolved revisions
-vendor/      .gitignored
-```
+- `github.com/uniplaces/logrus v1.1.0` (forked logrus — see below)
+- `github.com/pkg/errors v0.8.0`
+- `github.com/stretchr/testify v1.10.0`
+- `github.com/google/uuid v1.6.0` (added in v0.8.0 for `requestcontext.Ensure`)
 
-There is no `go.mod`. Go-modules consumers resolve via the `v0.7.0` tag — Go's module proxy
-synthesises a pseudo-module for any tagged repo without a `go.mod`.
+Indirect transitives are recorded in `go.sum`. Use `go mod tidy` after every dep change.
 
 ## Forked logrus (`github.com/uniplaces/logrus`)
 
@@ -140,8 +143,10 @@ RFC3164-compliance related. Log shipping (Graylog) depends on the formatter beha
 
 ## Versioning
 
-Tags are sequential semver-ish. Latest is `v0.7.0`. Consumer pinning is done by `go.mod`
-require line, e.g. `github.com/uniplaces/go-logger v0.7.0`.
+Tags are sequential semver-ish. Latest is `v0.8.0` (adds `requestcontext` + `go.mod`).
+Consumer pinning is done by `go.mod` require line, e.g.
+`github.com/uniplaces/go-logger v0.8.0`. Services that have not adopted `requestcontext`
+remain pinned to `v0.7.0`.
 
 **Backward compatibility:** field names in JSON output are part of the contract — log
 shippers, dashboards, and alerting rules grep on `app-id`, `env`, `git-hash`, `type`,
@@ -158,3 +163,61 @@ those.
 - **Trailing blank line:** every file ends with a blank line.
 - **No build tags, no Makefile, no Dockerfile.** This repo only ships source; tooling lives
   in the consuming service.
+
+## `requestcontext` sub-package
+
+`github.com/uniplaces/go-logger/requestcontext` carries per-request correlation id and
+structured fields through `context.Context` and provides outbound HTTP propagation. Added in
+`v0.8.0` to extract the pattern from `aggregate-graphql/internal/requestid` so other services
+can adopt it.
+
+### Public surface
+
+| Symbol | Purpose |
+|---|---|
+| `HeaderName = "X-Request-Id"` | Wire header for cross-service propagation |
+| `WithID(ctx, id)` / `ID(ctx)` | Stash / read the request id on a context |
+| `Ensure(ctx) (ctx, id)` | Mint a UUIDv4 when the id is absent; idempotent when present |
+| `WithFields(ctx)` | Attach an empty mutable field bag to ctx — call once at the request boundary |
+| `Set(ctx, k, v)` | Add to the field bag; concurrency-safe; no-op when `WithFields` not called |
+| `IterateFields(ctx, fn)` | Read each bag field in place under the read lock; no allocation (hot-path read) |
+| `Snapshot(ctx)` | Shallow copy of the bag; never nil (use when an isolated copy is needed) |
+| `Logger(ctx) LogBuilder` | `logger.Builder()` pre-populated with `request_id` + bag fields |
+| `HTTPFailure(ctx, component, url, status, err, reason)` | Origin-log helper for HTTP-adapter failures |
+| `QueryFailure(ctx, component, queryID, err, reason)` | Origin-log helper for DB query failures |
+| `RoundTripper(base)` / `WrapClient(c)` | Outbound HTTP: inject `X-Request-Id` automatically |
+| `InjectHTTPHeader(ctx, h)` | Escape hatch for raw `*http.Request` builders |
+
+### Field bag semantics
+
+The bag is a `*sync.RWMutex`-guarded map stashed once on the context by `WithFields`. Child
+contexts derived via `context.WithValue` / `context.WithCancel` / etc. share the same bag
+pointer — code deep in a handler can `Set(ctx, ...)` and a request-line emitter holding the
+parent ctx sees it. `IterateFields` reads the bag in place under the read lock and is what
+`Logger(ctx)` uses per log line (no per-call allocation); `Snapshot` returns a copy for the
+rarer case where a caller needs an isolated map that outlives the lock.
+
+### Outbound propagation
+
+`WrapClient(httpClient)` returns a shallow copy of the client with its `Transport` wrapped; the
+input client is never mutated, so passing `http.DefaultClient` is safe (a nil client defaults to
+`http.DefaultClient`). From then on, any outbound request through the returned client carries
+`X-Request-Id` when its context has one. Pre-set headers are not overwritten — callers retain an
+explicit override. The wrapper also clones the request before mutating headers, so the caller's
+`*http.Request` is never modified.
+
+### `LogBuilder` type alias
+
+`logger.LogBuilder` is a type alias (`type LogBuilder = builder`) in the root package, added
+so the `requestcontext` package can name the type in `Logger(ctx) LogBuilder`'s return
+signature. The alias is named `LogBuilder` (not `Builder`) because the root package already
+exports a `Builder()` function and Go uses a single namespace for types and functions within
+a package. The alias is purely additive — existing `logger.Builder()` call sites keep their
+behaviour bit-for-bit.
+
+### Backwards compatibility
+
+The existing `logger.Init`, `logger.Builder`, `logger.AddDefaultField`,
+`logger.Error/Info/Warning/Debug` surface is unchanged. Services pinned to `v0.7.0` continue
+to work without modification. Adopting `requestcontext` is opt-in per service — bump to
+`v0.8.0` when you're ready to use it.
