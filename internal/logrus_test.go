@@ -20,8 +20,8 @@ func TestLogrusLoggerLevel(t *testing.T) {
 
 	l.Error("test error")
 
-	assert.Contains(t, buffer.String(), "level=2")
-	assert.Contains(t, buffer.String(), "msg=\"test error\"")
+	assert.Contains(t, buffer.String(), `"level":"error"`)
+	assert.Contains(t, buffer.String(), `"msg":"test error"`)
 }
 
 func TestLogrusLoggerStackTrace(t *testing.T) {
@@ -73,7 +73,7 @@ func TestLogrusLoggerWithFields(t *testing.T) {
 	assert.Empty(t, buffer.String())
 
 	l.WarningWithFields("warning", map[string]interface{}{"abc": 321})
-	assert.Contains(t, buffer.String(), "abc=321")
+	assert.Contains(t, buffer.String(), `"abc":321`)
 }
 
 func TestLogrusLoggerInvalidConfig(t *testing.T) {
